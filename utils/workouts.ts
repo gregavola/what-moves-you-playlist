@@ -45,6 +45,25 @@ export async function getWorkoutClass(classId: string, db: mongoDB.Db) {
   return response;
 }
 
+export async function getValidWorkouts(workouts: any) {
+  if (!workouts?.data) {
+    return false;
+  }
+
+  const filteredWorkouts = workouts.data.filter((workout: any) => {
+    // if it has a run or ride, it's greater than 5 min, isn't a "Just Run / Just Ride" and isn't a Scenic Ride (playlist changes)
+    return (
+      workout.ride &&
+      (workout.name === "Cycling Workout" ||
+        workout.name === "Running Workout") &&
+      workout.ride?.duration > 600 &&
+      workout.ride.id !== "00000000000000000000000000000000"
+    );
+  });
+
+  return filteredWorkouts.length === 0 ? false : true;
+}
+
 export async function storeWorkoutClasses(
   classId: string,
   workoutClasses: any,

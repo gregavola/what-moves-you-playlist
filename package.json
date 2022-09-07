@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-sqs": "^3.165.0",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.0",
     "lodash.find": "^4.6.0",
@@ -37,6 +38,6 @@
     "@types/react-dom": "18.0.6",
     "eslint": "8.23.0",
     "eslint-config-next": "12.2.5",
-    "typescript": "4.8.2"
+    "typescript": "^4.8.2"
   }
 }

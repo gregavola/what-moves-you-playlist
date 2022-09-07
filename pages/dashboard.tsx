@@ -5,6 +5,7 @@ import { Play, List } from "react-feather";
 import Layout from "../components/Layout";
 import {
   PelotonData,
+  PelotonQueueStatus,
   PelotonSongData,
   Song,
   SongMeta,
@@ -28,7 +29,6 @@ import Type from "../components/Type";
 import Progress from "../components/Progress";
 import LoadingIndicator from "../components/LoadingIndicator";
 import ButtonPrimary from "../components/ButtonPrimary";
-import HortizontalRule from "../components/HorizontalRule";
 import HorizontalRule from "../components/HorizontalRule";
 
 export async function getServerSideProps(ctx: any) {
@@ -84,6 +84,7 @@ const Dashboard = ({
     useState(false);
   const [isMatchingComplete, setIsMatchingComplete] = useState(false);
   const [percentageComplete, setPercetageComplete] = useState(0);
+  const [workerPerc, setWorkPerc] = useState(0);
   const [modalError, setModalError] = useState("");
   const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
   const [pData, setPData] = useState<PelotonData>();
@@ -144,20 +145,48 @@ const Dashboard = ({
     // }
   };
 
+  const handlePolling = async () => {
+    const pollingInterval = setInterval(async () => {
+      getPelotonData()
+        .then((data: PelotonData | PelotonQueueStatus) => {
+          if ((data as PelotonData).workouts) {
+            clearInterval(intervalQuestion);
+            clearInterval(pollingInterval);
+            setIsLoading(false);
+            setPData(data as PelotonData);
+            setWorkPerc(0);
+          } else {
+            setWorkPerc((data as PelotonQueueStatus).percentage);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, 7000);
+  };
+
   const handleRequest = async () => {
     setIsLoading(true);
+    setIsError("");
     await checkAuthRefresh();
 
     startRandomQuestions();
 
-    getPelotonData({
-      userId: userInfoJSON.pelotonUserId || "",
-      cookie: userInfoJSON.pelotonCookie || "",
-    })
-      .then((data: PelotonData) => {
-        setPData(data);
-        setIsLoading(false);
-        clearInterval(intervalQuestion);
+    getPelotonData()
+      .then((data: PelotonData | PelotonQueueStatus) => {
+        if ((data as PelotonData).status === "NO_DATA") {
+          setIsError(
+            "You don't appear to have any workouts that would count during that last 45 days."
+          );
+        } else {
+          if ((data as PelotonData).workouts) {
+            setPData(data as PelotonData);
+            setIsLoading(false);
+            clearInterval(intervalQuestion);
+          } else {
+            handlePolling();
+          }
+        }
       })
       .catch(() => {
         clearInterval(intervalQuestion);
@@ -353,6 +382,17 @@ const Dashboard = ({
             <Type as="h1" variant="alto" className="mb-3 text-center">
               {randomPromptQuestions}
             </Type>
+            {workerPerc && workerPerc !== 0 && (
+              <div className="d-flex align-items-center mt-3 mb-3 w-100">
+                <Progress
+                  value={workerPerc}
+                  className="w-100"
+                  animated={true}
+                  striped={true}
+                  variant={workerPerc > 80 ? "success" : "info"}
+                />
+              </div>
+            )}
             <LoadingIndicator />
           </div>
         )}

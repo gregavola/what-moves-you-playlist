@@ -1,27 +1,21 @@
-import axios from 'axios';
-import { PelotonData, Song, UserAuthResponse } from './types';
+import axios from "axios";
+import {
+  PelotonData,
+  PelotonQueueStatus,
+  Song,
+  UserAuthResponse,
+} from "./types";
 
 export function checkUserAuth(): Promise<UserAuthResponse> {
-  return axios.get(`/api/authCheck`).then(response => {
+  return axios.get(`/api/authCheck`).then((response) => {
     return response.data;
   });
 }
 
-export function getPelotonData({
-  userId,
-  cookie,
-}: {
-  userId: string;
-  cookie: string;
-}): Promise<PelotonData> {
-  return axios
-    .post('/api/peloton', {
-      userId,
-      cookie,
-    })
-    .then(response => {
-      return response.data;
-    });
+export function getPelotonData(): Promise<PelotonData | PelotonQueueStatus> {
+  return axios.post("/api/peloton").then((response) => {
+    return response.data;
+  });
 }
 
 export function addPeloton({
@@ -32,11 +26,11 @@ export function addPeloton({
   password: string;
 }): Promise<any> {
   return axios
-    .post('/api/peloton/auth', {
+    .post("/api/peloton/auth", {
       username,
       password,
     })
-    .then(response => {
+    .then((response) => {
       return response.data;
     });
 }
@@ -52,7 +46,7 @@ export function addPlaylist({
     .post(`/api/playlist?playlistId=${playlistId}`, {
       songs,
     })
-    .then(response => {
+    .then((response) => {
       return response.data;
     });
 }
@@ -66,7 +60,7 @@ export function createSpotiftyPlaylist({
     .post(`/api/spotify/playlist/create`, {
       trackIds,
     })
-    .then(response => {
+    .then((response) => {
       return response.data;
     });
 }
@@ -83,7 +77,7 @@ export function apiCreateSpotifyPlaylist({
       userId,
       name,
     })
-    .then(response => {
+    .then((response) => {
       return response.data;
     });
 }
@@ -95,13 +89,13 @@ export function beginMatching({
 }): Promise<any> {
   return axios
     .post(`/api/spotify/search?playlistId=${playlistId}`)
-    .then(response => {
+    .then((response) => {
       return response.data;
     });
 }
 
 export function checkAuthRefresh(): Promise<any> {
-  return axios.post('/api/spotify/auth').then(response => {
+  return axios.post("/api/spotify/auth").then((response) => {
     return response.data;
   });
 }

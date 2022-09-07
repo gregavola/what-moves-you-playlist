@@ -86,8 +86,21 @@ export interface PelotonSongData {
 }
 
 export interface PelotonData {
+  status?: string;
   workouts: PelotonSongData[];
   uniqueSongs: Song[];
+}
+
+export interface PelotonQueueStatus {
+  accountId: string;
+  queueId: string;
+  status: "INPROGRESS" | "COMPLETE";
+  messageId: string;
+  createdAt: string;
+  updatedAt: string;
+  currentWorkout: number;
+  totalWorkouts: number;
+  percentage: number;
 }
 
 export interface User {
