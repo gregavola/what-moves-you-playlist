@@ -1,0 +1,42 @@
+{
+  "name": "the-musical-output",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "bootstrap": "^5.2.0",
+    "lodash.find": "^4.6.0",
+    "lodash.orderby": "^4.6.0",
+    "moment": "^2.29.4",
+    "mongodb": "^4.5.0",
+    "next": "12.2.5",
+    "next-auth": "^4.10.3",
+    "peloton-client-node": "https://github.com/Team-GC/peloton-client-node.git",
+    "pusher": "^5.1.1-beta",
+    "pusher-js": "^7.4.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.5.0",
+    "react-dom": "^18.2.0",
+    "react-feather": "^2.0.10",
+    "react-is": "^18.2.0",
+    "react-moment": "^1.1.2",
+    "spotify-web-api-node": "^5.0.2",
+    "spotify-web-api-ts": "^1.4.5",
+    "styled-components": "^5.3.5",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "18.7.13",
+    "@types/react": "18.0.17",
+    "@types/react-dom": "18.0.6",
+    "eslint": "8.23.0",
+    "eslint-config-next": "12.2.5",
+    "typescript": "4.8.2"
+  }
+}
