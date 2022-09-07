@@ -28,13 +28,17 @@ export default function AvatarHeader({
           }}
           body={
             <div>
-              <Type as="p" variant="celloCanon">
+              <Type as="h3" variant="celloCanon">
                 What is this data?
               </Type>
-              <Type as="p" variant="ballad">
+              <Type as="p" variant="ballad" className="mb-2">
                 This data shows you all classes you have taken in the last 45
-                days on Peloton that are a Running Class (outdoor workous are
-                included) or a Cycling Class.
+                days on Peloton that are a Running Class (outdoor workouts are
+                included) or a Cycling Class. We do not include any rides or
+                runs below 5 minutes or Scenic or Just Run/Rides. These
+                activities either do have documented playlists (i.e are just
+                radio) or not enough time data to make a decision about your
+                output.
               </Type>
               <Type as="p" variant="ballad">
                 When then determine your top output and what song was playing
@@ -43,16 +47,17 @@ export default function AvatarHeader({
               </Type>
               <Type as="p" variant="ballad">
                 Finally, we map songs on Peloton to Spotify to create a playlist
-                for you! This project was created during Music Mission Hot
-                Summer Hack Project for Q3 2022.
+                for you! We do not store your Peloton login information, we only
+                convert it to a session to make requests on your behalf (i.e to
+                pull your data)
               </Type>
-              <Type as="p" variant="celloCanon" className="mt-3">
+              <Type as="h3" variant="celloCanon" className="mt-3">
                 Who created this?
               </Type>
 
               <Type as="p" variant="ballad">
-                This project was created by Greg Avola (@grega). Please reach
-                out if you have any questions!
+                This project was created by Greg Avola (@gregavola). Please
+                reach out if you have any questions on Twitter.
               </Type>
             </div>
           }

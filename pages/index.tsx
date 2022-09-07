@@ -30,8 +30,8 @@ const Index = ({ hostUrl }: { hostUrl: string }) => {
         <Type
           as="h1"
           variant="forte"
-          className="mb-2 text-uppercase"
-          style={{ letterSpacing: 2, fontSize: 50 }}
+          className="mb-2 text-uppercase text-center"
+          style={{ letterSpacing: 2, fontSize: 60 }}
         >
           💪 What Drives You Playlist 🎼
         </Type>
@@ -55,11 +55,11 @@ const Index = ({ hostUrl }: { hostUrl: string }) => {
         >
           Login with Spotify
         </ButtonPrimary>
-      </div>
 
-      <div className="d-flex text-center text-muted justify-content-center">
-        This site is not affilated with Spotify or Peloton Interactive. Made
-        with 💜 by @<a href="https://twitter.com/gregavola">gregavola</a>
+        <div className="mt-5 d-flex text-center text-muted justify-content-center">
+          This site is not affilated with Spotify or Peloton Interactive. Made
+          with 💜 by @<a href="https://twitter.com/gregavola">gregavola</a>
+        </div>
       </div>
     </Layout>
   );

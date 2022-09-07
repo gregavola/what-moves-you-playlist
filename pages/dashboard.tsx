@@ -199,7 +199,7 @@ const Dashboard = ({
             <React.Fragment>
               {modalError && (
                 <div className="m-3">
-                  <Banner colorSet="negative">{modalError}</Banner>
+                  <Banner colorSet="danger">{modalError}</Banner>
                 </div>
               )}
               <Type as="p" style={{ textAlign: "center" }} variant="balladBold">
@@ -245,7 +245,7 @@ const Dashboard = ({
           footer={
             <>
               {isCreatingSpotifyPlaylist && (
-                <div className="d-flex justify-content-center">
+                <div className="d-flex justify-content-center w-100">
                   <LoadingIndicator />
                 </div>
               )}
@@ -320,7 +320,7 @@ const Dashboard = ({
       <div>
         {isError && (
           <div className="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
-            <Banner colorSet="negative" className="mb-3">
+            <Banner colorSet="danger" className="mb-3">
               {isError}
             </Banner>
             <ButtonPrimary
@@ -333,7 +333,7 @@ const Dashboard = ({
             </ButtonPrimary>
           </div>
         )}
-        {bannerText && <Banner colorSet="positive">{bannerText}</Banner>}
+        {bannerText && <Banner colorSet="success">{bannerText}</Banner>}
         {!isLoading && (
           <div className="d-flex justify-content-between align-items-center mt-5">
             <Type as="h1" variant="alto">
@@ -350,7 +350,7 @@ const Dashboard = ({
 
         {isLoading && (
           <div className="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
-            <Type as="h1" variant="alto" className="mb-3">
+            <Type as="h1" variant="alto" className="mb-3 text-center">
               {randomPromptQuestions}
             </Type>
             <LoadingIndicator />

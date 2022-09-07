@@ -20,8 +20,12 @@ export default function FormGroup({
   return (
     <Form.Group className={className}>
       {labelText && <Form.Label>{labelText}</Form.Label>}
-      <Form.Control type={formType || "text"} placeholder={placeHolder || ""} />
-      {formText && <Form.Text onChange={onChange}>{formText}</Form.Text>}
+      <Form.Control
+        type={formType || "text"}
+        onChange={onChange}
+        placeholder={placeHolder || ""}
+      />
+      {formText && <Form.Text>{formText}</Form.Text>}
     </Form.Group>
   );
 }

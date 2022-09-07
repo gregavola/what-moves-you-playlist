@@ -73,7 +73,7 @@ const LinkPeloton = () => {
       <div className="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
         {isChecking && (
           <React.Fragment>
-            <Type as="h1" variant="alto" className="mb-3">
+            <Type as="h1" variant="alto" className="mb-3 text-center">
               Checking For Peloton Account...
             </Type>
 
@@ -85,7 +85,7 @@ const LinkPeloton = () => {
           <React.Fragment>
             {isError && (
               <React.Fragment>
-                <Banner colorSet="negative">{isError}</Banner>
+                <Banner colorSet="danger">{isError}</Banner>
                 <HorizontalRule />
               </React.Fragment>
             )}
@@ -97,7 +97,8 @@ const LinkPeloton = () => {
             <Type as="p" variant="celloCanon" className="text-center mb-5">
               In order to grab your data from Peloton, please enter your login
               credentials for Peloton. Your username and password will not be
-              stored with this service.
+              stored with this service. It is only used exchange for a session
+              token to make calls on your behalf.
             </Type>
 
             <div className="w-75">
