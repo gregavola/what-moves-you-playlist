@@ -49,7 +49,7 @@ const Index = ({ hostUrl }: { hostUrl: string }) => {
           className="btn-success"
           onClick={() => {
             signIn("spotify", {
-              callbackUrl: `${hostUrl}/api/callback`,
+              callbackUrl: `${hostUrl}/api/authCallback`,
             });
           }}
         >

@@ -1,22 +1,24 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { getSession } from 'next-auth/react';
-import { addUser } from '../../utils/crudUser';
+import type { NextApiRequest, NextApiResponse } from "next";
+import { getSession } from "next-auth/react";
+import { addUser } from "../../utils/crudUser";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
+  res.setHeader("Cache-Control", "no-store");
+
   const session = await getSession({ req });
 
   try {
     if (!session) {
-      return res.status(401).json({ error: 'Not Logged In' });
+      return res.status(401).json({ error: "Not Logged In" });
     }
 
     const accountId = session.userId as string;
 
     if (!accountId) {
-      return res.status(500).json({ error: 'No Account ID' });
+      return res.status(500).json({ error: "No Account ID" });
     }
 
     await addUser({
@@ -29,10 +31,10 @@ export default async function handler(
       expiresIn: session.expiresIn as number,
     });
 
-    return res.redirect(301, '/auth');
+    return res.redirect(302, "/auth");
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
-    return res.status(500).json({ error: 'Something unexpected happened.' });
+    return res.status(500).json({ error: "Something unexpected happened." });
   }
 }

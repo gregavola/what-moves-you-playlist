@@ -1,5 +1,5 @@
-import { connectDB, disconnectDB } from './db';
-import { User } from './types';
+import { connectDB, disconnectDB } from "./db";
+import { User } from "./types";
 
 export async function addUser({
   accountId,
@@ -12,7 +12,7 @@ export async function addUser({
 }: User) {
   const db = await connectDB();
 
-  const userCollection = await db.collection('users');
+  const userCollection = await db.collection("users");
 
   const userQuery = { accountId };
   const userUpdateQuery = {
@@ -37,7 +37,7 @@ export async function addUser({
   const response = await userCollection.updateOne(
     userQuery,
     userUpdateQuery,
-    options,
+    options
   );
 
   await disconnectDB();
@@ -52,7 +52,7 @@ export async function addPeloton({
 }: User) {
   const db = await connectDB();
 
-  const userCollection = await db.collection('users');
+  const userCollection = await db.collection("users");
 
   const userQuery = { accountId };
   const userUpdateQuery = {
@@ -67,7 +67,7 @@ export async function addPeloton({
   const response = await userCollection.updateOne(
     userQuery,
     userUpdateQuery,
-    options,
+    options
   );
 
   await disconnectDB();
@@ -78,7 +78,7 @@ export async function addPeloton({
 export async function removePeloton({ accountId }: User) {
   const db = await connectDB();
 
-  const userCollection = await db.collection('users');
+  const userCollection = await db.collection("users");
 
   const userQuery = { accountId };
   const userUpdateQuery = {
@@ -102,7 +102,7 @@ export async function updateSpotifyPlaylistId({
 }: User) {
   const db = await connectDB();
 
-  const userCollection = await db.collection('users');
+  const userCollection = await db.collection("users");
 
   const userQuery = { accountId };
   const userUpdateQuery = {
@@ -126,7 +126,7 @@ export async function updateSpotifyCredentials({
 }: User) {
   const db = await connectDB();
 
-  const userCollection = await db.collection('users');
+  const userCollection = await db.collection("users");
 
   const userQuery = { accountId };
   const userUpdateQuery = {
