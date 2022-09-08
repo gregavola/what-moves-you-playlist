@@ -31,7 +31,7 @@ const Index = ({ hostUrl }: { hostUrl: string }) => {
           as="h1"
           variant="forte"
           className="mb-2 text-uppercase text-center"
-          style={{ letterSpacing: 2, fontSize: 60 }}
+          style={{ letterSpacing: 2 }}
         >
           💪 What Drives You Playlist 🎼
         </Type>

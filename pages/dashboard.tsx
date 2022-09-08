@@ -382,7 +382,7 @@ const Dashboard = ({
             <Type as="h1" variant="alto" className="mb-3 text-center">
               {randomPromptQuestions}
             </Type>
-            {workerPerc && workerPerc !== 0 && (
+            {workerPerc !== 0 && (
               <div className="d-flex align-items-center mt-3 mb-3 w-100">
                 <Progress
                   value={workerPerc}
