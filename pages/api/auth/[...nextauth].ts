@@ -1,27 +1,27 @@
-import NextAuth from 'next-auth';
-import SpotifyProvider from 'next-auth/providers/spotify';
+import NextAuth from "next-auth";
+import SpotifyProvider from "next-auth/providers/spotify";
 // eslint-disable-next-line new-cap
 export default NextAuth({
   // Configure one or more authentication providers
   providers: [
     // eslint-disable-next-line new-cap
     SpotifyProvider({
-      clientId: process.env.SPOTIFY_CLIENT_ID || '',
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET || '',
+      clientId: process.env.SPOTIFY_CLIENT_ID || "",
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET || "",
       authorization:
-        'https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private,playlist-modify-private,playlist-modify-public,playlist-read-collaborative',
+        "https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private,playlist-modify-private,playlist-modify-public,ugc-image-upload",
     }),
     // ...add more providers here
   ],
   secret: process.env.AUTH_SECRET,
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
   },
   jwt: {
     secret: process.env.AUTH_SECRET,
   },
   pages: {
-    error: '/error',
+    error: "/error",
   },
   callbacks: {
     async signIn() {

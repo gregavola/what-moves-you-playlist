@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
 import { Play, List } from "react-feather";
 import Layout from "../components/Layout";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 import {
   PelotonData,
   PelotonQueueStatus,
@@ -78,10 +81,10 @@ const Dashboard = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isError, setIsError] = useState("");
+  const [showLogOut, setShowLogOut] = useState(false);
   const [randomPromptQuestions, setRandomPromptQuestions] = useState(
     "Generating Data from Peloton..."
   );
-  const [bannerText, setBannerText] = useState("");
   const [isCreatingSpotifyPlaylist, setIsCreatingSpotifyPlaylist] =
     useState(false);
   const [isMatchingComplete, setIsMatchingComplete] = useState(false);
@@ -168,33 +171,46 @@ const Dashboard = ({
   };
 
   const handleRequest = async () => {
+    console.log("called");
+
     setIsLoading(true);
+    setShowLogOut(false);
     setIsError("");
-    await checkAuthRefresh();
 
-    startRandomQuestions();
+    checkAuthRefresh()
+      .then((data) => {
+        startRandomQuestions();
 
-    getPelotonData()
-      .then((data: PelotonData | PelotonQueueStatus) => {
-        if ((data as PelotonData).status === "NO_DATA") {
-          setIsError(
-            "You don't appear to have any workouts that would count during that last 45 days."
-          );
-        } else {
-          if ((data as PelotonData).workouts) {
-            setPData(data as PelotonData);
-            setIsLoading(false);
+        getPelotonData()
+          .then((data: PelotonData | PelotonQueueStatus) => {
+            if ((data as PelotonData).status === "NO_DATA") {
+              setIsError(
+                "You don't appear to have any workouts that would count during that last 45 days."
+              );
+            } else {
+              if ((data as PelotonData).workouts) {
+                setPData(data as PelotonData);
+                setIsLoading(false);
+                clearInterval(intervalQuestion);
+              } else {
+                handlePolling();
+              }
+            }
+          })
+          .catch(() => {
             clearInterval(intervalQuestion);
-          } else {
-            handlePolling();
-          }
-        }
+            setIsLoading(false);
+            setIsError(
+              "There was an problem grabbing your data. Please try again."
+            );
+          });
       })
-      .catch(() => {
-        clearInterval(intervalQuestion);
-        setIsLoading(false);
+      .catch((err) => {
+        console.error(err);
+        setIsLoading(true);
+        setShowLogOut(true);
         setIsError(
-          "There was an problem grabbing your data. Please try again."
+          "There was an error with your connected Spotify account. Please try logging out via the button below."
         );
       });
   };
@@ -204,9 +220,6 @@ const Dashboard = ({
     setModalError("");
     setSpotifySongs([]);
     setPercetageComplete(0);
-    // if (pusher) {
-    //   pusher.disconnect();
-    // }
   };
 
   useEffect(() => {
@@ -215,317 +228,362 @@ const Dashboard = ({
   }, []);
 
   return (
-    <Layout
-      title="The Musical Ouptut - Workouts and Music"
-      description="Your workouts and music a listed in one spot"
-    >
-      {isModalOpen && (
-        <DialogFullScreen
-          onClose={() => {
-            handleCloser();
-          }}
-          dialogTitle="What Moves You Playlist"
-          id="default"
-          body={
-            <React.Fragment>
-              {modalError && (
-                <div className="m-3">
-                  <Banner colorSet="danger">{modalError}</Banner>
-                </div>
-              )}
-              <Type as="p" style={{ textAlign: "center" }} variant="balladBold">
-                {isMatchingComplete
-                  ? "Songs for Playlist"
-                  : "Matching Songs..."}
-              </Type>
-              {isMatchingComplete && (
-                <Type as="p" variant="viola" className="mb-3 text-center">
-                  {spotifySongs.length} Songs
-                </Type>
-              )}
-              <div className="container">
-                {percentageComplete !== 100 && (
-                  <div className="d-flex align-items-center mt-3">
-                    <Progress value={percentageComplete} className="w-100" />
+    <React.Fragment>
+      <Toaster />
 
-                    <Type as="p" variant="cello" className="ms-3">
-                      {Math.round(percentageComplete)}%
-                    </Type>
+      <Layout
+        title="The Musical Ouptut - Workouts and Music"
+        description="Your workouts and music a listed in one spot"
+      >
+        {isModalOpen && (
+          <DialogFullScreen
+            onClose={() => {
+              handleCloser();
+            }}
+            dialogTitle="What Moves You Playlist"
+            id="default"
+            body={
+              <React.Fragment>
+                {modalError && (
+                  <div className="m-3">
+                    <Banner colorSet="danger">{modalError}</Banner>
                   </div>
                 )}
-                {!isMatchingComplete && (
-                  <div className="d-flex justify-content-center mt-5">
+                <Type
+                  as="p"
+                  style={{ textAlign: "center" }}
+                  variant="balladBold"
+                >
+                  {isMatchingComplete
+                    ? "Songs for Playlist"
+                    : "Matching Songs..."}
+                </Type>
+                {isMatchingComplete && (
+                  <Type as="p" variant="viola" className="mb-3 text-center">
+                    {spotifySongs.length} Songs
+                  </Type>
+                )}
+                <div className="container">
+                  {percentageComplete !== 100 && (
+                    <div className="d-flex align-items-center mt-3">
+                      <Progress value={percentageComplete} className="w-100" />
+
+                      <Type as="p" variant="cello" className="ms-3">
+                        {Math.round(percentageComplete)}%
+                      </Type>
+                    </div>
+                  )}
+                  {!isMatchingComplete && (
+                    <div className="d-flex justify-content-center mt-5">
+                      <LoadingIndicator />
+                    </div>
+                  )}
+
+                  {spotifySongs && (
+                    <React.Fragment>
+                      {spotifySongs.map((item: Song) => {
+                        return (
+                          <div className="mb-3" key={item.uri}>
+                            <SongListItem song={item} />
+                          </div>
+                        );
+                      })}
+                    </React.Fragment>
+                  )}
+                </div>
+              </React.Fragment>
+            }
+            footer={
+              <>
+                {isCreatingSpotifyPlaylist && (
+                  <div className="d-flex justify-content-center w-100">
                     <LoadingIndicator />
                   </div>
                 )}
-
-                {spotifySongs && (
-                  <React.Fragment>
-                    {spotifySongs.map((item: Song) => {
-                      return (
-                        <div className="mb-3" key={item.uri}>
-                          <SongListItem song={item} />
-                        </div>
-                      );
-                    })}
-                  </React.Fragment>
-                )}
-              </div>
-            </React.Fragment>
-          }
-          footer={
-            <>
-              {isCreatingSpotifyPlaylist && (
-                <div className="d-flex justify-content-center w-100">
-                  <LoadingIndicator />
-                </div>
-              )}
-              {!isCreatingSpotifyPlaylist && !isLoading && (
-                <>
-                  {isMatchingComplete && (
-                    <React.Fragment>
-                      <ButtonPrimary
-                        buttonSize="lg"
-                        onClick={() => {
-                          handleCloser();
-                        }}
-                      >
-                        Close
-                      </ButtonPrimary>
-                      <ButtonPrimary
-                        buttonSize="lg"
-                        className="d-flex align-items-center btn-success"
-                        onClick={async () => {
-                          if (!spotifySongs || spotifySongs.length === 0) {
-                            setModalError(
-                              "There was an error creating your playlist."
-                            );
-                          } else {
-                            setModalError("");
-                            setIsCreatingSpotifyPlaylist(true);
-                            const trackIds: Array<string | undefined> =
-                              spotifySongs.map((item: Song) => {
-                                return item.uri;
-                              });
-
-                            if (!trackIds) {
+                {!isCreatingSpotifyPlaylist && !isLoading && (
+                  <>
+                    {isMatchingComplete && (
+                      <React.Fragment>
+                        <ButtonPrimary
+                          buttonSize="lg"
+                          onClick={() => {
+                            handleCloser();
+                          }}
+                        >
+                          Close
+                        </ButtonPrimary>
+                        <ButtonPrimary
+                          buttonSize="lg"
+                          className="d-flex align-items-center btn-success"
+                          onClick={async () => {
+                            if (!spotifySongs || spotifySongs.length === 0) {
                               setModalError(
                                 "There was an error creating your playlist."
                               );
                             } else {
-                              createSpotiftyPlaylist({ trackIds })
-                                .then(() => {
-                                  setIsModalOpen(false);
-                                  setIsCreatingSpotifyPlaylist(false);
-                                  setBannerText(
-                                    "Great! Your playlist has been created!"
-                                  );
-                                  setTimeout(() => {
-                                    setBannerText("");
-                                  }, 3000);
-                                })
-                                .catch(() => {
-                                  setIsCreatingSpotifyPlaylist(false);
-                                  setModalError(
-                                    "There was an error creating your playlist."
-                                  );
+                              setModalError("");
+                              setIsCreatingSpotifyPlaylist(true);
+                              const trackIds: Array<string | undefined> =
+                                spotifySongs.map((item: Song) => {
+                                  return item.uri;
                                 });
+
+                              if (!trackIds) {
+                                setModalError(
+                                  "There was an error creating your playlist."
+                                );
+                              } else {
+                                createSpotiftyPlaylist({ trackIds })
+                                  .then(() => {
+                                    setIsModalOpen(false);
+                                    setIsCreatingSpotifyPlaylist(false);
+
+                                    setTimeout(() => {
+                                      window.scrollTo(0, 0);
+                                      toast.success(
+                                        "Great! Your playlist has been created!",
+                                        {
+                                          icon: "👏",
+                                        }
+                                      );
+                                    }, 60);
+                                  })
+                                  .catch(() => {
+                                    setIsCreatingSpotifyPlaylist(false);
+                                    setModalError(
+                                      "There was an error creating your playlist."
+                                    );
+                                  });
+                              }
                             }
-                          }
-                        }}
-                      >
-                        <List className="me-2" />
-                        <span>Save Playlist</span>
-                      </ButtonPrimary>
-                    </React.Fragment>
-                  )}
-                </>
-              )}
-            </>
-          }
-        />
-      )}
-      <div>
-        {isError && (
-          <div className="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
-            <Banner colorSet="danger" className="mb-3">
-              {isError}
-            </Banner>
-            <ButtonPrimary
-              buttonSize="lg"
-              onClick={() => {
-                handleRequest();
-              }}
-            >
-              Retry
-            </ButtonPrimary>
-          </div>
-        )}
-        {bannerText && (
-          <ToastAlert title="Success 🟢" body={bannerText} show={true} />
-        )}
-        {!isLoading && (
-          <div className="d-flex justify-content-between align-items-center mt-5">
-            <Type as="h1" variant="alto">
-              Workouts & Music 💪
-            </Type>
-            <AvatarHeader
-              username={userInfoJSON.username || ""}
-              imageUrl={userInfoJSON.avatar || ""}
-              includeLogout
-              baseUrl={baseUrl}
-            />
-          </div>
-        )}
-
-        {isLoading && (
-          <div className="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
-            <Type as="h1" variant="alto" className="mb-3 text-center">
-              {randomPromptQuestions}
-            </Type>
-            {workerPerc !== 0 && (
-              <div className="d-flex align-items-center mt-3 mb-3 w-100">
-                <Progress
-                  value={workerPerc}
-                  className="w-100"
-                  animated={true}
-                  striped={true}
-                  variant={workerPerc > 80 ? "success" : "info"}
-                />
-              </div>
-            )}
-            <LottieLoader
-              style={{ height: 250, width: 250, marginTop: 15 }}
-              loop={true}
-            />
-          </div>
-        )}
-
-        <HorizontalRule />
-      </div>
-      <div className="pb-5">
-        {!isLoading && pData && (
-          <React.Fragment>
-            {pData.workouts.map((item: PelotonSongData) => {
-              return (
-                <div key={item.workout.id}>
-                  <div className="d-flex align-items-center justify-content-between">
-                    <div className="d-flex align-items-center">
-                      <div className="image me-3">
-                        <Image
-                          src={item.workout.intructor.image_url}
-                          height="50"
-                          alt={item.workout.intructor.name}
-                          width="50"
-                          style={{ borderRadius: 25 }}
-                        />
-                      </div>
-                      <div className="meta me-3">
-                        <Type as="h5" variant="cello" className="mb-0">
-                          {item.workout.classTitle}
-                        </Type>
-
-                        <Type as="h6" variant="ballad">
-                          {item.workout.intructor.name} ·{" "}
-                          <Type as="span" variant="ballad">
-                            {item.workout.name}
-                          </Type>
-                        </Type>
-
-                        <Type as="p" variant="viola" className="text-muted">
-                          <Moment format="lll">
-                            {item.workout.createdAt * 1000}
-                          </Moment>
-                        </Type>
-                      </div>
-                    </div>
-                    <div className="output-range d-flex justify-content-center align-items-center">
-                      <div>
-                        <Type
-                          as="h5"
-                          variant="cello"
-                          className="text-center text-uppercase"
+                          }}
                         >
-                          Range
-                        </Type>
-                        <div className="d-flex align-items-center">
+                          <List className="me-2" />
+                          <span>Save Playlist</span>
+                        </ButtonPrimary>
+                      </React.Fragment>
+                    )}
+                  </>
+                )}
+              </>
+            }
+          />
+        )}
+        <div>
+          {isError && (
+            <div className="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
+              <Banner colorSet="danger" className="mb-3">
+                {isError}
+              </Banner>
+              {showLogOut ? (
+                <ButtonPrimary
+                  buttonSize="lg"
+                  className="btn-sucess"
+                  onClick={() => {
+                    signOut({
+                      callbackUrl: `${baseUrl}/`,
+                    });
+                  }}
+                >
+                  Logout
+                </ButtonPrimary>
+              ) : (
+                <ButtonPrimary
+                  buttonSize="lg"
+                  onClick={() => {
+                    handleRequest();
+                  }}
+                >
+                  Retry
+                </ButtonPrimary>
+              )}
+            </div>
+          )}
+          {!isLoading && (
+            <div className="d-flex justify-content-between align-items-center mt-5">
+              <Type as="h1" variant="alto">
+                Workouts & Music 💪
+              </Type>
+              <AvatarHeader
+                username={userInfoJSON.username || ""}
+                imageUrl={userInfoJSON.avatar || ""}
+                includeLogout
+                baseUrl={baseUrl}
+              />
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
+              <Type as="h1" variant="alto" className="mb-3 text-center">
+                {randomPromptQuestions}
+              </Type>
+              {workerPerc !== 0 && (
+                <div className="d-flex align-items-center mt-3 mb-3 w-100">
+                  <Progress
+                    value={workerPerc}
+                    className="w-100"
+                    animated={true}
+                    striped={true}
+                    variant={workerPerc > 80 ? "success" : "info"}
+                  />
+                </div>
+              )}
+              <LottieLoader
+                style={{ height: 250, width: 250, marginTop: 15 }}
+                loop={true}
+              />
+            </div>
+          )}
+
+          <HorizontalRule />
+        </div>
+        <div className="pb-5">
+          {!isLoading && pData && (
+            <React.Fragment>
+              {pData.workouts.map((item: PelotonSongData) => {
+                return (
+                  <div key={item.workout.id}>
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="d-flex align-items-center">
+                        <div className="image me-3">
+                          <Image
+                            src={item.workout.intructor.image_url}
+                            height="50"
+                            alt={item.workout.intructor.name}
+                            width="50"
+                            style={{ borderRadius: 25 }}
+                          />
+                        </div>
+                        <div className="meta me-3">
+                          <Type as="h5" variant="cello" className="mb-0">
+                            {item.workout.classTitle}
+                          </Type>
+
+                          <Type as="h6" variant="ballad">
+                            {item.workout.intructor.name} ·{" "}
+                            <Type as="span" variant="ballad">
+                              {item.workout.name}
+                            </Type>
+                          </Type>
+
+                          <Type as="p" variant="viola" className="text-muted">
+                            <Moment format="lll">
+                              {item.workout.createdAt * 1000}
+                            </Moment>
+                          </Type>
+                        </div>
+                      </div>
+                      <div className="output-range d-flex justify-content-center align-items-center">
+                        <div>
                           <Type
-                            as="h3"
-                            variant="celloCanon"
-                            className="text-center mb-0"
+                            as="h5"
+                            variant="cello"
+                            className="text-center text-uppercase"
                           >
-                            {item.workout.output.min} -{" "}
-                            {item.workout.output.max}
+                            Range
                           </Type>
-                          <Type as="p" variant="viola" className="ms-1 mb-0">
-                            kj
-                          </Type>
+                          <div className="d-flex align-items-center">
+                            <Type
+                              as="h3"
+                              variant="celloCanon"
+                              className="text-center mb-0"
+                            >
+                              {item.workout.output.min} -{" "}
+                              {item.workout.output.max}
+                            </Type>
+                            <Type as="p" variant="viola" className="ms-1 mb-0">
+                              kj
+                            </Type>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <HorizontalRule />
+                    <HorizontalRule />
 
-                  <Type
-                    as="h5"
-                    variant="balladBold"
-                    className="mb-3 text-uppercase"
-                  >
-                    Highest Output Songs
-                  </Type>
-                  {item.topSongs.map((songItem: SongMeta) => {
-                    return (
-                      <div
-                        key={`${item.workout.id}-${songItem.song.id}`}
-                        className="d-flex align-items-center justify-content-between mb-3 ps-3 pe-3"
-                      >
-                        <SongListItem song={songItem.song} />
-                        <div className="output-value d-flex align-items-center">
-                          <Type
-                            as="h1"
-                            variant="celloCanon"
-                            className="mb-0 text-center"
-                          >
-                            {songItem.output}
-                          </Type>
-                          <Type as="p" variant="viola" className="ms-1 mb-0">
-                            kj
-                          </Type>
+                    <Type
+                      as="h5"
+                      variant="balladBold"
+                      className="mb-3 text-uppercase"
+                    >
+                      Highest Output Songs
+                    </Type>
+                    {item.topSongs.map((songItem: SongMeta) => {
+                      return (
+                        <div
+                          key={`${item.workout.id}-${songItem.song.id}`}
+                          className="d-flex align-items-center justify-content-between mb-3 ps-3 pe-3"
+                        >
+                          <SongListItem song={songItem.song} />
+                          <div className="output-value d-flex align-items-center">
+                            <Type
+                              as="h1"
+                              variant="celloCanon"
+                              className="mb-0 text-center"
+                            >
+                              {songItem.output}
+                            </Type>
+                            <Type as="p" variant="viola" className="ms-1 mb-0">
+                              kj
+                            </Type>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
 
-                  <HorizontalRule />
-                </div>
-              );
-            })}
-          </React.Fragment>
-        )}
-      </div>
-
-      {!isLoading && (
-        <div className="floatingFooter">
-          <div className="d-flex justify-content-center mt-3 mb-3">
-            {!isCreatingPlaylist ? (
-              <ButtonPrimary
-                buttonSize="lg"
-                className="d-flex align-items-center"
-                onClick={() => {
-                  startPlaylist();
-                }}
-              >
-                <Play className="me-1" />
-                Create Playlist
-              </ButtonPrimary>
-            ) : (
-              <LoadingIndicator />
-            )}
-          </div>
+                    <HorizontalRule />
+                  </div>
+                );
+              })}
+            </React.Fragment>
+          )}
         </div>
-      )}
-    </Layout>
+
+        {!isLoading && !isError && (
+          <div className="floatingFooter">
+            <div className="d-flex justify-content-center mt-3 mb-3">
+              {!isCreatingPlaylist ? (
+                <React.Fragment>
+                  {userInfoJSON.spotifyPlaylistId && (
+                    <ButtonPrimary
+                      buttonSize="lg"
+                      className="d-flex align-items-center me-3 btn-success"
+                      onClick={() => {
+                        const url = `https://open.spotify.com/playlist/${userInfoJSON.spotifyPlaylistId}`;
+                        window.open(url, "_blank");
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faSpotify}
+                        height={25}
+                        width={25}
+                        className="me-2"
+                      />
+                      View Playlist
+                    </ButtonPrimary>
+                  )}
+                  <ButtonPrimary
+                    buttonSize="lg"
+                    className="d-flex align-items-center"
+                    onClick={() => {
+                      startPlaylist();
+                    }}
+                  >
+                    <Play className="me-1" />
+                    {userInfoJSON.spotifyPlaylistId
+                      ? "Update Playlist"
+                      : "Create Playlist"}
+                  </ButtonPrimary>
+                </React.Fragment>
+              ) : (
+                <LoadingIndicator />
+              )}
+            </div>
+          </div>
+        )}
+      </Layout>
+    </React.Fragment>
   );
 };
 

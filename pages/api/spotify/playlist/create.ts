@@ -4,6 +4,7 @@ import { getAuthUser } from "../../../../utils/getUserAuth";
 import { SpotifyWebApi } from "spotify-web-api-ts";
 import { updateSpotifyPlaylistId } from "../../../../utils/crudUser";
 import fs from "fs";
+import path from "path";
 
 const base64Encode = (file: any) => {
   // read binary data
@@ -45,7 +46,11 @@ export default async function handler(
     if (playlistId) {
       try {
         const response = await spotify.playlists.getPlaylist(playlistId);
-        playlistId = response.id;
+
+        // if you are not following it, re-follow
+        if (response.followers.total === 0) {
+          await spotify.follow.followPlaylist(playlistId);
+        }
       } catch (err) {
         console.error(err);
         if (err.message === "Request failed with status code 404") {
@@ -57,8 +62,8 @@ export default async function handler(
     if (!playlistId) {
       const response = await spotify.playlists.createPlaylist(
         accountId,
-        "What Drives You Playlist",
-        { public: false, collaborative: false }
+        "What Moves You Playlist",
+        { public: false }
       );
 
       playlistId = response.id;
@@ -74,14 +79,27 @@ export default async function handler(
       trackIds
     );
 
-    // const imageArtwork = "../../public/logo.png";
+    const jsonDirectory = path.join(process.cwd(), "public");
 
-    // await spotify.playlists.uploadPlaylistCover(
-    //   playlistId,
-    //   base64Encode(imageArtwork)
-    // );
+    const imageArtwork = `${jsonDirectory}/cover-image.jpg`;
 
-    return res.json({ status: "OK", response: responseAdd });
+    let imageResponse = null;
+    try {
+      imageResponse = await spotify.playlists.uploadPlaylistCover(
+        playlistId,
+        base64Encode(imageArtwork)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+
+    return res.json({
+      status: "OK",
+      response: responseAdd,
+      imageResponse,
+      image: imageArtwork,
+      base64: base64Encode(imageArtwork),
+    });
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
