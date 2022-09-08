@@ -3,6 +3,14 @@ import { getSession } from "next-auth/react";
 import { getAuthUser } from "../../../../utils/getUserAuth";
 import { SpotifyWebApi } from "spotify-web-api-ts";
 import { updateSpotifyPlaylistId } from "../../../../utils/crudUser";
+import fs from "fs";
+
+const base64Encode = (file: any) => {
+  // read binary data
+  var bitmap = fs.readFileSync(file);
+  // convert binary data to base64 encoded string
+  return Buffer.from(bitmap).toString("base64");
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -65,6 +73,13 @@ export default async function handler(
       playlistId,
       trackIds
     );
+
+    // const imageArtwork = "../../public/logo.png";
+
+    // await spotify.playlists.uploadPlaylistCover(
+    //   playlistId,
+    //   base64Encode(imageArtwork)
+    // );
 
     return res.json({ status: "OK", response: responseAdd });
   } catch (err) {

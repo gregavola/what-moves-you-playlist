@@ -31,6 +31,7 @@ import LoadingIndicator from "../components/LoadingIndicator";
 import ButtonPrimary from "../components/ButtonPrimary";
 import HorizontalRule from "../components/HorizontalRule";
 import LottieLoader from "../components/LottieLoader";
+import ToastAlert from "../components/ToastAlert";
 
 export async function getServerSideProps(ctx: any) {
   const session = await getSession(ctx);
@@ -293,16 +294,13 @@ const Dashboard = ({
                       </ButtonPrimary>
                       <ButtonPrimary
                         buttonSize="lg"
+                        className="d-flex align-items-center btn-success"
                         onClick={async () => {
                           if (!spotifySongs || spotifySongs.length === 0) {
                             setModalError(
                               "There was an error creating your playlist."
                             );
                           } else {
-                            // if (pusher) {
-                            //   pusher.disconnect();
-                            // }
-
                             setModalError("");
                             setIsCreatingSpotifyPlaylist(true);
                             const trackIds: Array<string | undefined> =
@@ -337,7 +335,7 @@ const Dashboard = ({
                         }}
                       >
                         <List className="me-2" />
-                        Create Playlist
+                        <span>Save Playlist</span>
                       </ButtonPrimary>
                     </React.Fragment>
                   )}
@@ -363,7 +361,9 @@ const Dashboard = ({
             </ButtonPrimary>
           </div>
         )}
-        {bannerText && <Banner colorSet="success">{bannerText}</Banner>}
+        {bannerText && (
+          <ToastAlert title="Success 🟢" body={bannerText} show={true} />
+        )}
         {!isLoading && (
           <div className="d-flex justify-content-between align-items-center mt-5">
             <Type as="h1" variant="alto">

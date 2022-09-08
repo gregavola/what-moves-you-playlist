@@ -13,6 +13,10 @@ body {
   border: none;
 }
 
+.toast-container {
+  position: fixed !important;
+}
+
 .no-outline:active, .no-outline:hover, .no-outline:focus {
   background-color: transparent !important;
   border: none !important;
