@@ -34,6 +34,18 @@ export default async function handler(
 
     let playlistId = userInfo.spotifyPlaylistId;
 
+    if (playlistId) {
+      try {
+        const response = await spotify.playlists.getPlaylist(playlistId);
+        playlistId = response.id;
+      } catch (err) {
+        console.error(err);
+        if (err.message === "Request failed with status code 404") {
+          playlistId = null;
+        }
+      }
+    }
+
     if (!playlistId) {
       const response = await spotify.playlists.createPlaylist(
         accountId,
@@ -49,7 +61,7 @@ export default async function handler(
       });
     }
 
-    const responseAdd = await spotify.playlists.addItemsToPlaylist(
+    const responseAdd = await spotify.playlists.replacePlaylistItems(
       playlistId,
       trackIds
     );
