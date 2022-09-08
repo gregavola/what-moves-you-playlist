@@ -8,7 +8,15 @@ body {
   margin: 0;
 }
 
+.no-outline {
+  background-color: transparent;
+  border: none;
+}
 
+.no-outline:active, .no-outline:hover, .no-outline:focus {
+  background-color: transparent !important;
+  border: none !important;
+}
 
 .modal-dialog .modal-footer  {
   justify-content: space-between!important;

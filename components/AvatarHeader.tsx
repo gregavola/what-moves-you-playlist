@@ -83,12 +83,12 @@ export default function AvatarHeader({
           <React.Fragment>
             <ButtonPrimary
               buttonSize="sm"
-              className="me-3"
+              className="me-3 no-outline"
               onClick={() => {
                 setIsModalOpen(true);
               }}
             >
-              <HelpCircle />
+              <HelpCircle color={"#000"} />
             </ButtonPrimary>
 
             <ButtonPrimary

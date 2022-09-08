@@ -9,6 +9,7 @@ import HorizontalRule from "../components/HorizontalRule";
 import Banner from "../components/Banner";
 import ButtonPrimary from "../components/ButtonPrimary";
 import FormGroup from "../components/FormGroup";
+import LottieHelper from "../components/LottieLoader";
 
 export async function getServerSideProps(ctx: any) {
   const session = await getSession(ctx);
@@ -77,7 +78,10 @@ const LinkPeloton = () => {
               Checking For Peloton Account...
             </Type>
 
-            <LoadingIndicator />
+            <LottieHelper
+              style={{ height: 250, width: 250, marginTop: 15 }}
+              loop={true}
+            />
           </React.Fragment>
         )}
 

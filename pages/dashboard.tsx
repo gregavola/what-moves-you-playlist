@@ -30,6 +30,7 @@ import Progress from "../components/Progress";
 import LoadingIndicator from "../components/LoadingIndicator";
 import ButtonPrimary from "../components/ButtonPrimary";
 import HorizontalRule from "../components/HorizontalRule";
+import LottieLoader from "../components/LottieLoader";
 
 export async function getServerSideProps(ctx: any) {
   const session = await getSession(ctx);
@@ -393,7 +394,10 @@ const Dashboard = ({
                 />
               </div>
             )}
-            <LoadingIndicator />
+            <LottieLoader
+              style={{ height: 250, width: 250, marginTop: 15 }}
+              loop={true}
+            />
           </div>
         )}
 

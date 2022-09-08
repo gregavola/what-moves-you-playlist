@@ -1,9 +1,12 @@
 import React from "react";
 import { getSession, signIn } from "next-auth/react";
+import Image from "next/image";
 import Layout from "../components/Layout";
 import Type from "../components/Type";
 import ButtonPrimary from "../components/ButtonPrimary";
 import HorizontalRule from "../components/HorizontalRule";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 
 export async function getServerSideProps(ctx: any) {
   const session = await getSession(ctx);
@@ -25,8 +28,18 @@ export async function getServerSideProps(ctx: any) {
 
 const Index = ({ hostUrl }: { hostUrl: string }) => {
   return (
-    <Layout title="The Musical Ouptut" description="Musical Output">
+    <Layout
+      title="What Moves You Playlist - Favorite Songs via Ouptut"
+      description="A simple service that creates a Spotify playlist of songs that are playing during your highest ouptut on Peloton."
+    >
       <div className="d-flex flex-column min-vh-100 justify-content-center align-items-center p-5">
+        <Image
+          src="/logo.png"
+          height="200"
+          width="200"
+          alt="What Drives You Logo"
+        />
+
         <Type
           as="h1"
           variant="forte"
@@ -36,23 +49,29 @@ const Index = ({ hostUrl }: { hostUrl: string }) => {
           💪 What Drives You Playlist 🎼
         </Type>
 
-        <Type as="h5" variant="celloCanon" className="text-center mb-3 mt-3">
-          We create a personal playlist based on your Peloton workouts, showing
+        <Type as="h5" variant="celloCanon" className="text-center mb-1 mt-3">
+          We create a personal playlist based on your Peloton™ workouts, showing
           you songs that had your highest output during a ride or run. To get
-          started, please login with your Spotify account.
+          started, please login with your Spotify™ account.
         </Type>
 
         <HorizontalRule />
 
         <ButtonPrimary
           buttonSize="lg"
-          className="btn-success"
+          className="btn-success d-flex align-items-center"
           onClick={() => {
             signIn("spotify", {
               callbackUrl: `${hostUrl}/api/authCallback`,
             });
           }}
         >
+          <FontAwesomeIcon
+            icon={faSpotify}
+            height={25}
+            width={25}
+            className="me-2"
+          />
           Login with Spotify
         </ButtonPrimary>
 
