@@ -511,11 +511,12 @@ const Dashboard = ({
             {!isCreatingPlaylist ? (
               <ButtonPrimary
                 buttonSize="lg"
+                className="d-flex align-items-center"
                 onClick={() => {
                   startPlaylist();
                 }}
               >
-                <Play className="me-2" />
+                <Play className="me-1" />
                 Create Playlist
               </ButtonPrimary>
             ) : (
