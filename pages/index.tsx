@@ -37,7 +37,7 @@ const Index = ({ hostUrl }: { hostUrl: string }) => {
           src="/logo.png"
           height="200"
           width="200"
-          alt="What Drives You Logo"
+          alt="What Moves You Logo"
         />
 
         <Type
@@ -46,7 +46,7 @@ const Index = ({ hostUrl }: { hostUrl: string }) => {
           className="mb-2 text-uppercase text-center"
           style={{ letterSpacing: 2 }}
         >
-          💪 What Drives You Playlist 🎼
+          💪 What Moves You Playlist 🎼
         </Type>
 
         <Type as="h5" variant="celloCanon" className="text-center mb-1 mt-3">

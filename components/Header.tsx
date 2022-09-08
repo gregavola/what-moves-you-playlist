@@ -56,7 +56,7 @@ export default function Header({ title, description }: HeaderProps) {
         name="twitter:url"
         content={`https://whatmovesyouplaylist.com${canonicalURL}`}
       />
-      <meta name="twitter:image" content="/public/tw-og.png" />
+      <meta name="twitter:image" content="/public/tw-og-v2.png" />
 
       <meta property="og:title" content={title} />
       <meta property="og:site_name" content={title} />
@@ -65,7 +65,7 @@ export default function Header({ title, description }: HeaderProps) {
         content={`https://whatmovesyouplaylist.com${canonicalURL}`}
       />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content="/public/fb-og.png" />
+      <meta property="og:image" content="/public/fb-og-v2.png" />
 
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" />

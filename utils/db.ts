@@ -6,6 +6,8 @@ export async function disconnectDB() {
   try {
     if (client) {
       client.close();
+    } else {
+      console.log(`No Connection`);
     }
   } catch (err) {
     // eslint-disable-next-line no-console

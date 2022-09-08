@@ -132,6 +132,8 @@ export default async function handler(
 
           return res.json(newQueueStatus);
         } else {
+          await disconnectDB();
+
           return res.json(queueStatus);
         }
       }
