@@ -420,13 +420,7 @@ const Dashboard = ({
               </Type>
               {workerPerc !== 0 && (
                 <div className="d-flex align-items-center mt-3 mb-3 w-100">
-                  <Progress
-                    value={workerPerc}
-                    className="w-100"
-                    animated={true}
-                    striped={true}
-                    variant={workerPerc > 80 ? "success" : "info"}
-                  />
+                  <Progress value={workerPerc} className="w-100" />
                 </div>
               )}
               <LottieLoader
